@@ -345,7 +345,7 @@ const ProductDetail = () => {
               {product.variants?.sizes && product.variants.sizes.length > 0 && (
                 <div className="mb-3">
                   <div className="mb-2" style={{ fontSize: '0.95rem' }}>
-                    Số Lượng{selectedSize && <span className="text-muted ms-2">({selectedSize})</span>}
+                    Kích thước{selectedSize && <span className="text-muted ms-2">({selectedSize})</span>}
                   </div>
                   <div className="d-flex gap-2 flex-wrap">
                     {product.variants.sizes.map((size) => (
@@ -371,7 +371,7 @@ const ProductDetail = () => {
               {product.variants?.colors && product.variants.colors.length > 0 && (
                 <div className="mb-3">
                   <div className="mb-2" style={{ fontSize: '0.95rem' }}>
-                    Phân Loại{selectedColor && <span className="text-muted ms-2">({selectedColor})</span>}
+                    Màu sắc{selectedColor && <span className="text-muted ms-2">({selectedColor})</span>}
                   </div>
                   <div className="d-flex gap-2 flex-wrap">
                     {product.variants.colors.map((color) => (
