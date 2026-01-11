@@ -22,7 +22,21 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="card h-100 shadow-sm">
+    <div 
+      className="card h-100 shadow-sm"
+      style={{
+        transition: 'all 0.3s ease',
+        border: '1px solid transparent',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.border = '2px solid var(--primary)';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 146, 60, 0.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.border = '1px solid transparent';
+        e.currentTarget.style.boxShadow = '';
+      }}
+    >
       <Link to={`/products/${product.id}`} className="text-decoration-none text-dark">
         <div className="position-relative">
           <img
