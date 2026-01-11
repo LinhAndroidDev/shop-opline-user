@@ -339,7 +339,16 @@ const ProductDetail = () => {
               </h5>
             </div>
             <div className="card-body">
-              <p className="mb-0">{product.description}</p>
+              <div 
+                className="mb-0" 
+                style={{ 
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word',
+                  lineHeight: '1.6'
+                }}
+              >
+                {product.description}
+              </div>
             </div>
           </div>
         </div>
