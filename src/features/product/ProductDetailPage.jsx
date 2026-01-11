@@ -195,6 +195,7 @@ const ProductDetail = () => {
                         key={index}
                         className="cursor-pointer"
                         onClick={() => setSelectedImage(index)}
+                        onMouseEnter={() => setSelectedImage(index)}
                         style={{
                           minWidth: '70px',
                           width: '70px',
@@ -204,6 +205,7 @@ const ProductDetail = () => {
                           overflow: 'hidden',
                           backgroundColor: '#fff',
                           flexShrink: 0,
+                          transition: 'border-color 0.2s ease',
                         }}
                       >
                         <img
