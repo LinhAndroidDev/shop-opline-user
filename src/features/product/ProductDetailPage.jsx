@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { products } from '../../shared/utils/mockData';
 import { useCart } from '../../features/cart/cartSlice';
 import { Modal } from 'antd';
+import { productApi } from './productApi';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
@@ -16,13 +17,34 @@ const ProductDetail = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    const foundProduct = products.find((p) => p.id === parseInt(id));
-    if (foundProduct) {
-      setProduct(foundProduct);
-      setSelectedColor(foundProduct.variants?.colors?.[0] || '');
-      setSelectedSize(foundProduct.variants?.sizes?.[0] || '');
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const productData = await productApi.getById(id);
+        setProduct(productData);
+        setSelectedColor(productData.variants?.colors?.[0] || '');
+        setSelectedSize(productData.variants?.sizes?.[0] || '');
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProduct();
     }
   }, [id]);
+
+  if (loading) {
+    return (
+      <div className="container my-5 text-center py-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Đang tải...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -43,26 +65,62 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    if (!selectedColor || !selectedSize) {
-      Modal.warning({
-        title: 'Chọn biến thể',
-        content: 'Vui lòng chọn màu sắc và kích thước trước khi thêm vào giỏ hàng.',
-      });
-      return;
+    // Check if product has variants
+    const hasVariants = product.variants && 
+      (product.variants.colors?.length > 0 || product.variants.sizes?.length > 0);
+    
+    if (hasVariants) {
+      // If has variants, require selection
+      if (product.variants.colors?.length > 0 && !selectedColor) {
+        Modal.warning({
+          title: 'Chọn biến thể',
+          content: 'Vui lòng chọn màu sắc trước khi thêm vào giỏ hàng.',
+        });
+        return;
+      }
+      if (product.variants.sizes?.length > 0 && !selectedSize) {
+        Modal.warning({
+          title: 'Chọn biến thể',
+          content: 'Vui lòng chọn kích thước trước khi thêm vào giỏ hàng.',
+        });
+        return;
+      }
     }
-    addToCart(product, { color: selectedColor, size: selectedSize }, quantity);
+    
+    addToCart(product, { 
+      color: selectedColor || '', 
+      size: selectedSize || '' 
+    }, quantity);
     setModalVisible(true);
   };
 
   const handleBuyNow = () => {
-    if (!selectedColor || !selectedSize) {
-      Modal.warning({
-        title: 'Chọn biến thể',
-        content: 'Vui lòng chọn màu sắc và kích thước trước khi mua hàng.',
-      });
-      return;
+    // Check if product has variants
+    const hasVariants = product.variants && 
+      (product.variants.colors?.length > 0 || product.variants.sizes?.length > 0);
+    
+    if (hasVariants) {
+      // If has variants, require selection
+      if (product.variants.colors?.length > 0 && !selectedColor) {
+        Modal.warning({
+          title: 'Chọn biến thể',
+          content: 'Vui lòng chọn màu sắc trước khi mua hàng.',
+        });
+        return;
+      }
+      if (product.variants.sizes?.length > 0 && !selectedSize) {
+        Modal.warning({
+          title: 'Chọn biến thể',
+          content: 'Vui lòng chọn kích thước trước khi mua hàng.',
+        });
+        return;
+      }
     }
-    addToCart(product, { color: selectedColor, size: selectedSize }, quantity);
+    
+    addToCart(product, { 
+      color: selectedColor || '', 
+      size: selectedSize || '' 
+    }, quantity);
     navigate('/cart');
   };
 
@@ -90,10 +148,13 @@ const ProductDetail = () => {
         <div className="col-md-6 mb-4">
           <div className="mb-3">
             <img
-              src={images[selectedImage]}
+              src={images[selectedImage] || product.image}
               className="img-fluid rounded shadow"
               alt={product.name}
               style={{ width: '100%', height: '500px', objectFit: 'cover' }}
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/500x500?text=No+Image';
+              }}
             />
           </div>
           {images.length > 1 && (
@@ -108,6 +169,9 @@ const ProductDetail = () => {
                   alt={`${product.name} ${index + 1}`}
                   onClick={() => setSelectedImage(index)}
                   style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+                  }}
                 />
               ))}
             </div>
@@ -116,11 +180,11 @@ const ProductDetail = () => {
 
         {/* Product Info */}
         <div className="col-md-6">
-          <h1 className="mb-3">{product.name}</h1>
+          <h1 className="mb-3" style={{ fontSize: '1.5rem', fontWeight: 500 }}>{product.name}</h1>
 
           {/* Price */}
           <div className="mb-3">
-            <h3 className="text-primary fw-bold mb-2">{formatPrice(product.price)}</h3>
+            <div className="text-primary mb-2" style={{ fontSize: '1.25rem', fontWeight: 500 }}>{formatPrice(product.price)}</div>
             {product.originalPrice && product.originalPrice > product.price && (
               <div>
                 <span className="text-muted text-decoration-line-through me-2">
@@ -161,7 +225,7 @@ const ProductDetail = () => {
           {/* Color Selection */}
           {product.variants?.colors && product.variants.colors.length > 0 && (
             <div className="mb-4">
-              <h6 className="fw-bold mb-3">Màu sắc: {selectedColor}</h6>
+              <div className="mb-3" style={{ fontSize: '0.95rem', fontWeight: 400 }}>Màu sắc{selectedColor && `: ${selectedColor}`}</div>
               <div className="d-flex gap-2 flex-wrap">
                 {product.variants.colors.map((color) => (
                   <button
@@ -181,7 +245,7 @@ const ProductDetail = () => {
           {/* Size Selection */}
           {product.variants?.sizes && product.variants.sizes.length > 0 && (
             <div className="mb-4">
-              <h6 className="fw-bold mb-3">Kích thước: {selectedSize}</h6>
+              <div className="mb-3" style={{ fontSize: '0.95rem', fontWeight: 400 }}>Kích thước{selectedSize && `: ${selectedSize}`}</div>
               <div className="d-flex gap-2 flex-wrap">
                 {product.variants.sizes.map((size) => (
                   <button
@@ -200,7 +264,7 @@ const ProductDetail = () => {
 
           {/* Quantity */}
           <div className="mb-4">
-            <h6 className="fw-bold mb-3">Số lượng</h6>
+            <div className="mb-3" style={{ fontSize: '0.95rem', fontWeight: 400 }}>Số lượng</div>
             <div className="d-flex align-items-center gap-3">
               <button
                 className="btn btn-outline-secondary"

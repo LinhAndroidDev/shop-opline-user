@@ -43,9 +43,9 @@ const ProductCard = ({ product }) => {
           )}
         </div>
         <div className="card-body d-flex flex-column">
-          <h6 className="card-title">{product.name}</h6>
+          <h6 className="card-title mb-2" style={{ fontSize: '0.9rem', fontWeight: 400, lineHeight: '1.4' }}>{product.name}</h6>
           <div className="mb-2">
-            <span className="fw-bold text-primary">{formatPrice(product.price)}</span>
+            <span className="text-primary" style={{ fontSize: '1rem', fontWeight: 500 }}>{formatPrice(product.price)}</span>
             {product.originalPrice && product.originalPrice > product.price && (
               <span className="text-muted text-decoration-line-through ms-2">
                 {formatPrice(product.originalPrice)}

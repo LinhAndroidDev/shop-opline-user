@@ -1,30 +1,35 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { products } from '../../shared/utils/mockData';
 import ProductCard from '../../shared/components/ProductCard';
 import { homeApi } from './homeApi';
+import { productApi } from '../product/productApi';
 
 const HomePage = () => {
   const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const featuredProducts = products.filter((p) => p.featured);
-  const bestsellerProducts = products.filter((p) => p.bestseller);
+  const featuredProducts = products.slice(0, 4); // Show first 4 as featured
+  const bestsellerProducts = products.slice(0, 4); // Show first 4 as bestseller
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await homeApi.getCategories();
-        setCategories(data);
+        const [categoriesData, productsData] = await Promise.all([
+          homeApi.getCategories(),
+          productApi.getAll(),
+        ]);
+        setCategories(categoriesData);
+        setProducts(productsData);
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCategories();
+    fetchData();
   }, []);
 
   return (
@@ -102,13 +107,25 @@ const HomePage = () => {
               Xem tất cả <i className="fas fa-arrow-right ms-2"></i>
             </Link>
           </div>
-          <div className="row g-4">
-            {featuredProducts.slice(0, 4).map((product) => (
-              <div key={product.id} className="col-6 col-md-4 col-lg-3">
-                <ProductCard product={product} />
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Đang tải...</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="row g-4">
+              {featuredProducts.map((product) => (
+                <div key={product.id} className="col-6 col-md-4 col-lg-3">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-5">
+              <p className="text-muted">Không có sản phẩm nào</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -121,13 +138,25 @@ const HomePage = () => {
               Xem tất cả <i className="fas fa-arrow-right ms-2"></i>
             </Link>
           </div>
-          <div className="row g-4">
-            {bestsellerProducts.slice(0, 4).map((product) => (
-              <div key={product.id} className="col-6 col-md-4 col-lg-3">
-                <ProductCard product={product} />
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Đang tải...</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ) : bestsellerProducts.length > 0 ? (
+            <div className="row g-4">
+              {bestsellerProducts.map((product) => (
+                <div key={product.id} className="col-6 col-md-4 col-lg-3">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-5">
+              <p className="text-muted">Không có sản phẩm nào</p>
+            </div>
+          )}
         </div>
       </section>
 

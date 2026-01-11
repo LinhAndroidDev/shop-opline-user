@@ -1,14 +1,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { products } from '../../shared/utils/mockData';
 import ProductCard from '../../shared/components/ProductCard';
 import { Table } from 'antd';
 import { homeApi } from '../home/homeApi';
+import { productApi } from './productApi';
 
 const ProductListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [selectedColor, setSelectedColor] = useState('all');
@@ -18,20 +20,30 @@ const ProductListing = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true);
         setCategoriesLoading(true);
-        const data = await homeApi.getCategories();
-        setCategories(data);
+        const [categoriesData, productsData] = await Promise.all([
+          homeApi.getCategories(),
+          productApi.getAll({
+            categoryId: searchParams.get('category'),
+            search: searchParams.get('search'),
+          }),
+        ]);
+        setCategories(categoriesData);
+        setProducts(productsData);
+        setFilteredProducts(productsData);
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching data:', error);
       } finally {
+        setLoading(false);
         setCategoriesLoading(false);
       }
     };
 
-    fetchCategories();
-  }, []);
+    fetchData();
+  }, [searchParams]);
 
   // Extract unique colors and sizes from products
   const allColors = useMemo(() => {
@@ -52,6 +64,8 @@ const ProductListing = () => {
 
   useEffect(() => {
     let filtered = [...products];
+    
+    if (products.length === 0) return;
 
     // Search filter
     if (searchQuery) {
@@ -110,7 +124,7 @@ const ProductListing = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [selectedCategory, selectedColor, selectedSize, priceRange, sortBy, searchQuery, searchParams]);
+  }, [products, selectedCategory, selectedColor, selectedSize, priceRange, sortBy, searchQuery, searchParams]);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
