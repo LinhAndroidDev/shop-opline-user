@@ -43,7 +43,22 @@ const ProductCard = ({ product }) => {
           )}
         </div>
         <div className="card-body d-flex flex-column">
-          <h6 className="card-title mb-2" style={{ fontSize: '0.9rem', fontWeight: 400, lineHeight: '1.4' }}>{product.name}</h6>
+          <h6 
+            className="card-title mb-2" 
+            style={{ 
+              fontSize: '0.9rem', 
+              fontWeight: 400, 
+              lineHeight: '1.4',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              minHeight: '2.8rem'
+            }}
+          >
+            {product.name}
+          </h6>
           <div className="mb-2">
             <span className="text-primary" style={{ fontSize: '1rem', fontWeight: 500 }}>{formatPrice(product.price)}</span>
             {product.originalPrice && product.originalPrice > product.price && (
