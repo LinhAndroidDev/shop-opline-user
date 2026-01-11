@@ -1,10 +1,31 @@
 import { Link } from 'react-router-dom';
-import { products, categories } from '../../shared/utils/mockData';
+import { useState, useEffect } from 'react';
+import { products } from '../../shared/utils/mockData';
 import ProductCard from '../../shared/components/ProductCard';
+import { homeApi } from './homeApi';
 
 const HomePage = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
   const featuredProducts = products.filter((p) => p.featured);
   const bestsellerProducts = products.filter((p) => p.bestseller);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const data = await homeApi.getCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <div>
@@ -40,23 +61,35 @@ const HomePage = () => {
       <section className="py-5">
         <div className="container">
           <h2 className="text-center mb-5 fw-bold">Danh mục nổi bật</h2>
-          <div className="row g-4">
-            {categories.map((category) => (
-              <div key={category.id} className="col-6 col-md-4 col-lg-2">
-                <Link
-                  to={`/products?category=${category.id}`}
-                  className="text-decoration-none text-dark"
-                >
-                  <div className="card text-center h-100 shadow-sm hover-shadow">
-                    <div className="card-body">
-                      <i className={`fas ${category.icon} fa-3x text-primary mb-3`}></i>
-                      <h6 className="card-title">{category.name}</h6>
-                    </div>
-                  </div>
-                </Link>
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Đang tải...</span>
               </div>
-            ))}
-          </div>
+            </div>
+          ) : categories.length > 0 ? (
+            <div className="row g-4">
+              {categories.map((category) => (
+                <div key={category.id} className="col-6 col-md-4 col-lg-2">
+                  <Link
+                    to={`/products?category=${category.id}`}
+                    className="text-decoration-none text-dark"
+                  >
+                    <div className="card text-center h-100 shadow-sm hover-shadow">
+                      <div className="card-body">
+                        <i className={`fas ${category.icon} fa-3x text-primary mb-3`}></i>
+                        <h6 className="card-title">{category.name}</h6>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-5">
+              <p className="text-muted">Không có danh mục nào</p>
+            </div>
+          )}
         </div>
       </section>
 

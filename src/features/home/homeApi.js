@@ -1,5 +1,6 @@
 // Home API - Fetch featured products, categories, etc.
-import { products, categories } from '../../shared/utils/mockData';
+import { products } from '../../shared/utils/mockData';
+import { apiClient } from '../../shared/utils/apiClient';
 
 export const homeApi = {
   getFeaturedProducts: async () => {
@@ -22,11 +23,30 @@ export const homeApi = {
   },
 
   getCategories: async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(categories);
-      }, 100);
-    });
+    try {
+      const categories = await apiClient.get('/category');
+      
+      // Transform API response to match component expectations
+      // Map API categories to include icon for display
+      const categoryIcons = {
+        'Quần áo': 'fa-tshirt',
+        'Đồ uống': 'fa-coffee',
+        'Điện thoại': 'fa-mobile-alt',
+        'Đồ ăn vặt': 'fa-cookie',
+        'Giày': 'fa-shoe-prints',
+      };
+
+      return categories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        parentId: category.parentId,
+        icon: categoryIcons[category.name] || 'fa-tag', // Default icon
+      }));
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      // Return empty array or fallback to mock data if API fails
+      return [];
+    }
   },
 };
 

@@ -1,18 +1,37 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { products, categories } from '../../shared/utils/mockData';
+import { products } from '../../shared/utils/mockData';
 import ProductCard from '../../shared/components/ProductCard';
 import { Table } from 'antd';
+import { homeApi } from '../home/homeApi';
 
 const ProductListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filteredProducts, setFilteredProducts] = useState(products);
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const [selectedColor, setSelectedColor] = useState('all');
   const [selectedSize, setSelectedSize] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 5000000]);
   const [sortBy, setSortBy] = useState('newest');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoading(true);
+        const data = await homeApi.getCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Extract unique colors and sizes from products
   const allColors = useMemo(() => {
@@ -131,6 +150,7 @@ const ProductListing = () => {
                   className="form-select"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
+                  disabled={categoriesLoading}
                 >
                   <option value="all">Tất cả</option>
                   {categories.map((cat) => (
@@ -139,6 +159,9 @@ const ProductListing = () => {
                     </option>
                   ))}
                 </select>
+                {categoriesLoading && (
+                  <small className="text-muted">Đang tải danh mục...</small>
+                )}
               </div>
 
               {/* Price Filter */}
