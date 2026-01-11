@@ -1,0 +1,132 @@
+/* Custom styles for the app */
+
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover-shadow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Ant Design overrides */
+.ant-table {
+  font-size: 14px;
+}
+
+.ant-table-thead > tr > th {
+  background: linear-gradient(135deg, var(--primary-gradient-light-start) 0%, var(--primary-gradient-light-end) 100%) !important;
+  color: var(--text-main) !important;
+  font-weight: 600 !important;
+  border-bottom: 2px solid var(--primary-light) !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(251, 146, 60, 0.35) !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-gradient-end) 0%, var(--primary-gradient-start) 100%) !important;
+  box-shadow: 0 6px 20px rgba(251, 146, 60, 0.45) !important;
+  transform: translateY(-2px) !important;
+}
+
+.ant-modal-header {
+  background-color: var(--primary-light) !important;
+}
+
+.ant-modal-title {
+  color: var(--text-main) !important;
+}
+
+.ant-badge-count {
+  background-color: var(--danger) !important;
+}
+
+/* MUI overrides */
+.MuiPaper-root {
+  border-radius: 8px;
+}
+
+.MuiButton-containedPrimary {
+  background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%) !important;
+  box-shadow: 0 4px 15px rgba(251, 146, 60, 0.35) !important;
+  transition: all 0.3s ease !important;
+}
+
+.MuiButton-containedPrimary:hover {
+  background: linear-gradient(135deg, var(--primary-gradient-end) 0%, var(--primary-gradient-start) 100%) !important;
+  box-shadow: 0 6px 20px rgba(251, 146, 60, 0.45) !important;
+  transform: translateY(-2px) !important;
+}
+
+.MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--primary) !important;
+}
+
+.MuiInputLabel-root.Mui-focused {
+  color: var(--primary) !important;
+}
+
+/* Bootstrap overrides */
+.navbar-brand {
+  font-size: 1.5rem;
+}
+
+.card {
+  border: none;
+  border-radius: 8px;
+  background-color: var(--bg-white);
+}
+
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Card hover effects */
+.card:hover {
+  box-shadow: 0 8px 25px rgba(251, 146, 60, 0.2) !important;
+  transition: all 0.3s ease;
+}
+
+/* Section backgrounds with subtle gradients */
+section.bg-white {
+  background: linear-gradient(to bottom, #ffffff 0%, var(--bg-main) 100%);
+}
+
+/* Button improvements */
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.btn-light:hover {
+  background-color: #ffffff !important;
+  color: var(--primary) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+  
+  .display-4 {
+    font-size: 2rem;
+  }
+}
