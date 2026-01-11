@@ -124,232 +124,358 @@ const ProductDetail = () => {
     navigate('/cart');
   };
 
-  const images = product.images || [product.image];
+  const images = product.images && product.images.length > 0 ? product.images : [product.image];
+  const hasMultipleImages = images.length > 1;
+
+  // Calculate delivery date (2-5 days from now)
+  const getDeliveryDate = () => {
+    const today = new Date();
+    const minDays = 2;
+    const maxDays = 5;
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + minDays);
+    const maxDate = new Date(today);
+    maxDate.setDate(today.getDate() + maxDays);
+    
+    const formatDate = (date) => {
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      return `${day} Th${month.toString().padStart(2, '0')}`;
+    };
+    
+    return `${formatDate(minDate)} - ${formatDate(maxDate)}`;
+  };
 
   return (
-    <div className="container my-5">
-      {/* Breadcrumb */}
-      <nav aria-label="breadcrumb" className="mb-4">
-        <ol className="breadcrumb">
-          <li className="breadcrumb-item">
-            <Link to="/">Trang chủ</Link>
-          </li>
-          <li className="breadcrumb-item">
-            <Link to="/products">Sản phẩm</Link>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            {product.name}
-          </li>
-        </ol>
-      </nav>
+    <div className="bg-main">
+      <div className="container py-4">
+        {/* Breadcrumb */}
+        <nav aria-label="breadcrumb" className="mb-3">
+          <ol className="breadcrumb mb-0" style={{ fontSize: '0.875rem' }}>
+            <li className="breadcrumb-item">
+              <Link to="/" className="text-decoration-none text-muted">Trang chủ</Link>
+            </li>
+            <li className="breadcrumb-item">
+              <Link to="/products" className="text-decoration-none text-muted">Sản phẩm</Link>
+            </li>
+            <li className="breadcrumb-item active" aria-current="page" style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {product.name}
+            </li>
+          </ol>
+        </nav>
 
-      <div className="row">
-        {/* Image Gallery */}
-        <div className="col-md-6 mb-4">
-          <div className="mb-3">
-            <img
-              src={images[selectedImage] || product.image}
-              className="img-fluid rounded shadow"
-              alt={product.name}
-              style={{ width: '100%', height: '500px', objectFit: 'cover' }}
-              onError={(e) => {
-                e.target.src = 'https://via.placeholder.com/500x500?text=No+Image';
-              }}
-            />
-          </div>
-          {images.length > 1 && (
-            <div className="d-flex gap-2">
-              {images.map((img, index) => (
+        {/* Main Product Section */}
+        <div className="bg-white rounded shadow-sm p-4 mb-4">
+          <div className="row g-4">
+            {/* Left: Product Images */}
+            <div className="col-lg-5">
+              {/* Main Image */}
+              <div className="mb-3" style={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#fff' }}>
                 <img
-                  key={index}
-                  src={img}
-                  className={`img-thumbnail cursor-pointer ${
-                    selectedImage === index ? 'border-primary' : ''
-                  }`}
-                  alt={`${product.name} ${index + 1}`}
-                  onClick={() => setSelectedImage(index)}
-                  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                  src={images[selectedImage] || product.image}
+                  className="img-fluid w-100"
+                  alt={product.name}
+                  style={{ 
+                    aspectRatio: '1 / 1',
+                    objectFit: 'contain',
+                    backgroundColor: '#fafafa'
+                  }}
                   onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/100x100?text=No+Image';
+                    e.target.src = 'https://via.placeholder.com/500x500?text=No+Image';
                   }}
                 />
-              ))}
+              </div>
+
+              {/* Thumbnail Carousel */}
+              {hasMultipleImages && (
+                <div className="position-relative">
+                  <div className="d-flex gap-2 overflow-auto" style={{ padding: '5px 0' }}>
+                    {images.map((img, index) => (
+                      <div
+                        key={index}
+                        className="cursor-pointer"
+                        onClick={() => setSelectedImage(index)}
+                        style={{
+                          minWidth: '70px',
+                          width: '70px',
+                          height: '70px',
+                          border: selectedImage === index ? '2px solid var(--primary)' : '1px solid #e5e7eb',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          backgroundColor: '#fff',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <img
+                          src={img}
+                          className="w-100 h-100"
+                          alt={`${product.name} ${index + 1}`}
+                          style={{ objectFit: 'contain', padding: '5px' }}
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/70x70?text=No+Image';
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Share Section */}
+              <div className="mt-3 pt-3 border-top d-flex align-items-center gap-3">
+                <span className="text-muted small">Chia sẻ:</span>
+                <div className="d-flex gap-2">
+                  <a href="#" className="text-decoration-none">
+                    <i className="fab fa-facebook text-primary" style={{ fontSize: '1.25rem' }}></i>
+                  </a>
+                  <a href="#" className="text-decoration-none">
+                    <i className="fab fa-pinterest text-danger" style={{ fontSize: '1.25rem' }}></i>
+                  </a>
+                  <a href="#" className="text-decoration-none">
+                    <i className="fab fa-twitter text-info" style={{ fontSize: '1.25rem' }}></i>
+                  </a>
+                </div>
+                <div className="ms-auto d-flex align-items-center gap-2 text-muted small cursor-pointer">
+                  <i className="far fa-heart"></i>
+                  <span>Đã thích (0)</span>
+                </div>
+              </div>
             </div>
-          )}
+
+            {/* Right: Product Info */}
+            <div className="col-lg-7">
+              {/* Product Title */}
+              <h1 className="mb-2" style={{ fontSize: '1.25rem', fontWeight: 400, lineHeight: '1.5', color: '#111827' }}>
+                {product.name}
+              </h1>
+
+              {/* Rating */}
+              <div className="d-flex align-items-center gap-3 mb-3">
+                <div className="d-flex align-items-center gap-1">
+                  <span className="text-warning">
+                    <i className="fas fa-star"></i>
+                  </span>
+                  <span className="fw-bold" style={{ fontSize: '0.95rem' }}>4.9</span>
+                </div>
+                <div className="border-start ps-3" style={{ height: '20px' }}></div>
+                <span className="text-muted" style={{ fontSize: '0.875rem' }}>22 Đánh giá</span>
+                <div className="border-start ps-3" style={{ height: '20px' }}></div>
+                <span className="text-muted" style={{ fontSize: '0.875rem' }}>Đã bán 100+</span>
+              </div>
+
+              {/* Price */}
+              <div className="bg-light rounded p-3 mb-3">
+                <div className="d-flex align-items-baseline gap-2">
+                  <span className="text-danger fw-bold" style={{ fontSize: '1.75rem' }}>
+                    {formatPrice(product.price)}
+                  </span>
+                  {product.originalPrice && product.originalPrice > product.price && (
+                    <>
+                      <span className="text-muted text-decoration-line-through" style={{ fontSize: '1rem' }}>
+                        {formatPrice(product.originalPrice)}
+                      </span>
+                      <span className="badge bg-danger" style={{ fontSize: '0.75rem' }}>
+                        -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                      </span>
+                    </>
+                  )}
+                </div>
+                {product.discount && (
+                  <div className="mt-1 small text-muted">
+                    Giảm {product.discount}% (Tiết kiệm {formatPrice(product.originalPrice - product.price)})
+                  </div>
+                )}
+              </div>
+
+              {/* Shipping Info */}
+              <div className="mb-3 pb-3 border-bottom">
+                <div className="d-flex align-items-start gap-2 mb-2">
+                  <i className="fas fa-truck text-primary mt-1" style={{ fontSize: '1.1rem' }}></i>
+                  <div className="flex-grow-1">
+                    <div className="fw-bold small mb-1">Vận Chuyển</div>
+                    <div className="small">
+                      Nhận từ <strong>{getDeliveryDate()}</strong>, phí giao 
+                      {product.price >= 500000 ? (
+                        <span className="text-success"> 0₫</span>
+                      ) : (
+                        <span> 50.000₫</span>
+                      )}
+                    </div>
+                    <div className="small text-success mt-1">
+                      <i className="fas fa-gift me-1"></i>
+                      Tặng Voucher 15.000₫ nếu đơn giao sau thời gian trên.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Shopee Assurance / Guarantee */}
+              <div className="mb-3 pb-3 border-bottom">
+                <div className="d-flex align-items-start gap-2">
+                  <i className="fas fa-shield-alt text-success mt-1" style={{ fontSize: '1.1rem' }}></i>
+                  <div className="flex-grow-1">
+                    <div className="fw-bold small mb-1">An Tâm Mua Sắm</div>
+                    <div className="small text-muted">
+                      Trả hàng miễn phí 15 ngày. Bảo hiểm bảo vệ người tiêu dùng
+                    </div>
+                  </div>
+                  <i className="fas fa-chevron-down text-muted small"></i>
+                </div>
+              </div>
+
+              {/* Stock Status */}
+              <div className="mb-3 pb-3 border-bottom">
+                <div className="d-flex align-items-center gap-2">
+                  <span className="small text-muted">Tình trạng:</span>
+                  {product.inStock ? (
+                    <span className="badge bg-success">
+                      <i className="fas fa-check me-1"></i>Còn hàng
+                    </span>
+                  ) : (
+                    <span className="badge bg-danger">
+                      <i className="fas fa-times me-1"></i>Hết hàng
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Size Selection (if exists) */}
+              {product.variants?.sizes && product.variants.sizes.length > 0 && (
+                <div className="mb-3">
+                  <div className="mb-2" style={{ fontSize: '0.95rem' }}>
+                    Số Lượng{selectedSize && <span className="text-muted ms-2">({selectedSize})</span>}
+                  </div>
+                  <div className="d-flex gap-2 flex-wrap">
+                    {product.variants.sizes.map((size) => (
+                      <button
+                        key={size}
+                        className={`btn ${
+                          selectedSize === size ? 'btn-primary' : 'btn-outline-secondary'
+                        }`}
+                        onClick={() => setSelectedSize(size)}
+                        style={{ 
+                          minWidth: '80px',
+                          border: selectedSize === size ? '2px solid var(--primary)' : '1px solid #e5e7eb'
+                        }}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Color/Type Selection (if exists) */}
+              {product.variants?.colors && product.variants.colors.length > 0 && (
+                <div className="mb-3">
+                  <div className="mb-2" style={{ fontSize: '0.95rem' }}>
+                    Phân Loại{selectedColor && <span className="text-muted ms-2">({selectedColor})</span>}
+                  </div>
+                  <div className="d-flex gap-2 flex-wrap">
+                    {product.variants.colors.map((color) => (
+                      <button
+                        key={color}
+                        className={`btn ${
+                          selectedColor === color ? 'btn-primary' : 'btn-outline-secondary'
+                        }`}
+                        onClick={() => setSelectedColor(color)}
+                        style={{ 
+                          minWidth: '120px',
+                          border: selectedColor === color ? '2px solid var(--primary)' : '1px solid #e5e7eb'
+                        }}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quantity Selector */}
+              <div className="mb-4">
+                <div className="mb-2" style={{ fontSize: '0.95rem' }}>Số Lượng</div>
+                <div className="d-flex align-items-center gap-2" style={{ width: 'fit-content' }}>
+                  <button
+                    className="btn btn-outline-secondary"
+                    style={{ width: '40px', height: '40px', padding: 0 }}
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                  >
+                    <i className="fas fa-minus"></i>
+                  </button>
+                  <input
+                    type="number"
+                    className="form-control text-center"
+                    style={{ width: '80px', height: '40px' }}
+                    value={quantity}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value) || 1;
+                      setQuantity(Math.max(1, value));
+                    }}
+                    min="1"
+                  />
+                  <button
+                    className="btn btn-outline-secondary"
+                    style={{ width: '40px', height: '40px', padding: 0 }}
+                    onClick={() => setQuantity(quantity + 1)}
+                  >
+                    <i className="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="d-flex gap-3">
+                <button
+                  className="btn flex-fill"
+                  style={{ 
+                    backgroundColor: '#fff',
+                    border: '1px solid var(--primary)',
+                    color: 'var(--primary)',
+                    height: '48px',
+                    fontSize: '1rem'
+                  }}
+                  onClick={handleAddToCart}
+                  disabled={!product.inStock}
+                >
+                  <i className="fas fa-shopping-cart me-2"></i>
+                  Thêm Vào Giỏ Hàng
+                </button>
+                <button
+                  className="btn btn-primary flex-fill"
+                  style={{ 
+                    height: '48px',
+                    fontSize: '1rem',
+                    fontWeight: 500
+                  }}
+                  onClick={handleBuyNow}
+                  disabled={!product.inStock}
+                >
+                  Mua Ngay
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Product Info */}
-        <div className="col-md-6">
-          <h1 className="mb-3" style={{ fontSize: '1.5rem', fontWeight: 500 }}>{product.name}</h1>
-
-          {/* Price */}
-          <div className="mb-3">
-            <div className="text-primary mb-2" style={{ fontSize: '1.25rem', fontWeight: 500 }}>{formatPrice(product.price)}</div>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <div>
-                <span className="text-muted text-decoration-line-through me-2">
-                  {formatPrice(product.originalPrice)}
-                </span>
-                <span className="badge bg-danger">
-                  -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
-                </span>
-              </div>
-            )}
+        {/* Product Description Section */}
+        <div className="bg-white rounded shadow-sm p-4">
+          <div className="mb-3 pb-2 border-bottom">
+            <h5 className="mb-0" style={{ fontSize: '1.125rem', fontWeight: 500 }}>
+              <i className="fas fa-info-circle me-2 text-primary"></i>Mô Tả Sản Phẩm
+            </h5>
           </div>
-
-          {/* Rating */}
-          {product.rating && (
-            <div className="mb-3">
-              <span className="text-warning">
-                <i className="fas fa-star"></i> {product.rating}
-              </span>
-              <span className="text-muted ms-2">({product.reviews} đánh giá)</span>
-            </div>
-          )}
-
-          {/* Stock Status */}
-          <div className="mb-4">
-            {product.inStock ? (
-              <span className="badge bg-success">
-                <i className="fas fa-check me-1"></i>Còn hàng
-              </span>
-            ) : (
-              <span className="badge bg-danger">
-                <i className="fas fa-times me-1"></i>Hết hàng
-              </span>
-            )}
-          </div>
-
-          <hr />
-
-          {/* Color Selection */}
-          {product.variants?.colors && product.variants.colors.length > 0 && (
-            <div className="mb-4">
-              <div className="mb-3" style={{ fontSize: '0.95rem', fontWeight: 400 }}>Màu sắc{selectedColor && `: ${selectedColor}`}</div>
-              <div className="d-flex gap-2 flex-wrap">
-                {product.variants.colors.map((color) => (
-                  <button
-                    key={color}
-                    className={`btn ${
-                      selectedColor === color ? 'btn-primary' : 'btn-outline-primary'
-                    }`}
-                    onClick={() => setSelectedColor(color)}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Size Selection */}
-          {product.variants?.sizes && product.variants.sizes.length > 0 && (
-            <div className="mb-4">
-              <div className="mb-3" style={{ fontSize: '0.95rem', fontWeight: 400 }}>Kích thước{selectedSize && `: ${selectedSize}`}</div>
-              <div className="d-flex gap-2 flex-wrap">
-                {product.variants.sizes.map((size) => (
-                  <button
-                    key={size}
-                    className={`btn ${
-                      selectedSize === size ? 'btn-primary' : 'btn-outline-primary'
-                    }`}
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Quantity */}
-          <div className="mb-4">
-            <div className="mb-3" style={{ fontSize: '0.95rem', fontWeight: 400 }}>Số lượng</div>
-            <div className="d-flex align-items-center gap-3">
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                disabled={quantity <= 1}
-              >
-                <i className="fas fa-minus"></i>
-              </button>
-              <input
-                type="number"
-                className="form-control text-center"
-                style={{ width: '100px' }}
-                value={quantity}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value) || 1;
-                  setQuantity(Math.max(1, value));
-                }}
-                min="1"
-              />
-              <button
-                className="btn btn-outline-secondary"
-                onClick={() => setQuantity(quantity + 1)}
-              >
-                <i className="fas fa-plus"></i>
-              </button>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="d-flex gap-3 mb-4">
-            <button
-              className="btn btn-primary btn-lg flex-fill"
-              onClick={handleAddToCart}
-              disabled={!product.inStock}
-            >
-              <i className="fas fa-cart-plus me-2"></i>
-              Thêm vào giỏ
-            </button>
-            <button
-              className="btn btn-success btn-lg flex-fill"
-              onClick={handleBuyNow}
-              disabled={!product.inStock}
-            >
-              <i className="fas fa-bolt me-2"></i>
-              Mua ngay
-            </button>
-          </div>
-
-          {/* Shipping Info */}
-          <div className="card" style={{ backgroundColor: 'var(--primary-light)' }}>
-            <div className="card-body">
-              <h6 className="fw-bold mb-2">
-                <i className="fas fa-truck me-2 text-primary"></i>Thông tin vận chuyển
-              </h6>
-              <ul className="mb-0 small">
-                <li>Miễn phí vận chuyển cho đơn hàng trên 500.000đ</li>
-                <li>Giao hàng trong 2-5 ngày làm việc</li>
-                <li>Đổi trả miễn phí trong 30 ngày</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Product Description */}
-      <div className="row mt-5">
-        <div className="col-12">
-          <div className="card">
-            <div className="card-header bg-primary text-white">
-              <h5 className="mb-0">
-                <i className="fas fa-info-circle me-2"></i>Mô tả chi tiết
-              </h5>
-            </div>
-            <div className="card-body">
-              <div 
-                className="mb-0" 
-                style={{ 
-                  whiteSpace: 'pre-wrap',
-                  wordWrap: 'break-word',
-                  lineHeight: '1.6'
-                }}
-              >
-                {product.description}
-              </div>
-            </div>
+          <div 
+            className="mt-3"
+            style={{ 
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word',
+              lineHeight: '1.8',
+              fontSize: '0.95rem',
+              color: '#374151'
+            }}
+          >
+            {product.description || 'Không có mô tả cho sản phẩm này.'}
           </div>
         </div>
       </div>
@@ -373,4 +499,3 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
-
