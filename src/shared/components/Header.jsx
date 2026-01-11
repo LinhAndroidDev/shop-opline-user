@@ -75,10 +75,10 @@ const Header = () => {
                 </span>
               )}
             </Link>
-            <button className="btn btn-outline-light">
+            <Link to="/login" className="btn btn-outline-light">
               <i className="fas fa-user me-2"></i>
               Đăng nhập
-            </button>
+            </Link>
           </div>
         </div>
       </div>
