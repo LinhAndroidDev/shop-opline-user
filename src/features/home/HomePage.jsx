@@ -102,7 +102,7 @@ const HomePage = () => {
       <section className="py-5 bg-white">
         <div className="container">
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="fw-bold mb-0">Sản phẩm nổi bật</h2>
+            <h2 className="fw-bold mb-0" style={{ fontSize: '1.25rem' }}>Sản phẩm nổi bật</h2>
             <Link to="/products?featured=true" className="btn btn-outline-primary">
               Xem tất cả <i className="fas fa-arrow-right ms-2"></i>
             </Link>
@@ -133,7 +133,7 @@ const HomePage = () => {
       <section className="py-5">
         <div className="container">
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="fw-bold mb-0">Sản phẩm bán chạy</h2>
+            <h2 className="fw-bold mb-0" style={{ fontSize: '1.25rem' }}>Sản phẩm bán chạy</h2>
             <Link to="/products?bestseller=true" className="btn btn-outline-primary">
               Xem tất cả <i className="fas fa-arrow-right ms-2"></i>
             </Link>
@@ -163,7 +163,7 @@ const HomePage = () => {
       {/* Promo Banner */}
       <section className="py-5 gradient-primary text-white">
         <div className="container text-center">
-          <h2 className="fw-bold mb-3">Giảm giá 50% cho đơn hàng đầu tiên</h2>
+          <h2 className="fw-bold mb-3" style={{ fontSize: '1.5rem' }}>Giảm giá 50% cho đơn hàng đầu tiên</h2>
           <p className="lead mb-4">Áp dụng cho tất cả sản phẩm trong tháng này</p>
           <Link to="/products" className="btn btn-light btn-lg shadow-lg">
             <i className="fas fa-tags me-2"></i>
