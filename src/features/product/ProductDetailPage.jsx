@@ -22,7 +22,9 @@ const ProductDetail = () => {
         setLoading(true);
         const productData = await productApi.getById(id);
         setProduct(productData);
-        setSelectedColor(productData.variants?.colors?.[0] || '');
+        // Handle color as object or string
+        const firstColor = productData.variants?.colors?.[0];
+        setSelectedColor(typeof firstColor === 'object' ? firstColor.name : (firstColor || ''));
         setSelectedSize(productData.variants?.sizes?.[0] || '');
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -348,21 +350,65 @@ const ProductDetail = () => {
                     Kích thước{selectedSize && <span className="text-muted ms-2">({selectedSize})</span>}
                   </div>
                   <div className="d-flex gap-2 flex-wrap">
-                    {product.variants.sizes.map((size) => (
-                      <button
-                        key={size}
-                        className={`btn ${
-                          selectedSize === size ? 'btn-primary' : 'btn-outline-secondary'
-                        }`}
-                        onClick={() => setSelectedSize(size)}
-                        style={{ 
-                          minWidth: '80px',
-                          border: selectedSize === size ? '2px solid var(--primary)' : '1px solid #e5e7eb'
-                        }}
-                      >
-                        {size}
-                      </button>
-                    ))}
+                    {product.variants.sizes.map((size) => {
+                      const isSelected = selectedSize === size;
+                      
+                      return (
+                        <button
+                          key={size}
+                          className="btn btn-outline-secondary position-relative"
+                          onClick={() => setSelectedSize(size)}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.borderColor = '#EF4444';
+                              e.currentTarget.querySelector('span').style.color = '#EF4444';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.borderColor = '#e5e7eb';
+                              e.currentTarget.querySelector('span').style.color = '';
+                            }
+                          }}
+                          style={{ 
+                            minWidth: '80px',
+                            border: isSelected ? '1px solid #EF4444' : '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            padding: '6px 10px',
+                            backgroundColor: '#fff',
+                            transition: 'all 0.2s ease',
+                            fontSize: '0.9rem'
+                          }}
+                        >
+                          <span style={{ 
+                            fontWeight: 400,
+                            color: isSelected ? '#EF4444' : 'inherit'
+                          }}>
+                            {size}
+                          </span>
+                          {isSelected && (
+                            <div
+                              className="position-absolute"
+                              style={{
+                                bottom: '4px',
+                                right: '4px',
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                backgroundColor: '#EF4444',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#fff',
+                                fontSize: '0.7rem'
+                              }}
+                            >
+                              <i className="fas fa-check"></i>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -374,21 +420,83 @@ const ProductDetail = () => {
                     Màu sắc{selectedColor && <span className="text-muted ms-2">({selectedColor})</span>}
                   </div>
                   <div className="d-flex gap-2 flex-wrap">
-                    {product.variants.colors.map((color) => (
-                      <button
-                        key={color}
-                        className={`btn ${
-                          selectedColor === color ? 'btn-primary' : 'btn-outline-secondary'
-                        }`}
-                        onClick={() => setSelectedColor(color)}
-                        style={{ 
-                          minWidth: '120px',
-                          border: selectedColor === color ? '2px solid var(--primary)' : '1px solid #e5e7eb'
-                        }}
-                      >
-                        {color}
-                      </button>
-                    ))}
+                    {product.variants.colors.map((color) => {
+                      // Handle color as object or string
+                      const colorName = typeof color === 'object' ? color.name : color;
+                      const colorHex = typeof color === 'object' ? color.hexCode : null;
+                      const isSelected = selectedColor === colorName;
+                      
+                      return (
+                        <button
+                          key={colorName}
+                          className="btn btn-outline-secondary position-relative"
+                          onClick={() => setSelectedColor(colorName)}
+                          onMouseEnter={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.borderColor = '#EF4444';
+                              e.currentTarget.querySelector('span').style.color = '#EF4444';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isSelected) {
+                              e.currentTarget.style.borderColor = '#e5e7eb';
+                              e.currentTarget.querySelector('span').style.color = '';
+                            }
+                          }}
+                          style={{ 
+                            minWidth: '110px',
+                            border: isSelected ? '1px solid #EF4444' : '1px solid #e5e7eb',
+                            borderRadius: '0',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '6px 10px',
+                            backgroundColor: '#fff',
+                            transition: 'all 0.2s ease',
+                            fontSize: '0.9rem'
+                          }}
+                        >
+                          {colorHex && (
+                            <div
+                              style={{
+                                width: '16px',
+                                height: '16px',
+                                borderRadius: '4px',
+                                backgroundColor: colorHex,
+                                border: '1px solid #e5e7eb',
+                                flexShrink: 0
+                              }}
+                            />
+                          )}
+                          <span style={{ 
+                            fontWeight: 400,
+                            color: isSelected ? '#EF4444' : 'inherit'
+                          }}>
+                            {colorName}
+                          </span>
+                          {isSelected && (
+                            <div
+                              className="position-absolute"
+                              style={{
+                                bottom: '4px',
+                                right: '4px',
+                                width: '18px',
+                                height: '18px',
+                                borderRadius: '50%',
+                                backgroundColor: '#EF4444',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#fff',
+                                fontSize: '0.7rem'
+                              }}
+                            >
+                              <i className="fas fa-check"></i>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

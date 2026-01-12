@@ -18,12 +18,10 @@ const transformProduct = (apiProduct) => {
     originalPrice: apiProduct.discount
       ? Math.round(apiProduct.price / (1 - apiProduct.discount / 100))
       : null,
-    // Transform variant
+    // Transform variant - keep color objects with hexCode and name
     variants: apiProduct.variant
       ? {
-          colors: apiProduct.variant.color
-            ? apiProduct.variant.color.map((c) => c.name)
-            : [],
+          colors: apiProduct.variant.color || [],
           sizes: apiProduct.variant.size || [],
         }
       : {
